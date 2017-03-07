@@ -155,6 +155,8 @@ def get_mv_data(chrom, pos, ref_allele, var_allele):
             mv_data['clinvar']['rcv'] = [mv_data['clinvar']['rcv']]
     if mv_data:
         allele_freq, freq_url = get_allele_freq(mv_data, var_allele)
+    else:
+        allele_freq, freq_url = None, None
     return hgvs_format, mv_data, allele_freq, freq_url
 
 

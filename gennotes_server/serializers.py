@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework import permissions, serializers
 from reversion import revisions as reversion
+from reversion.models import Version
 
 from .models import Relation, Variant
 
@@ -24,7 +25,10 @@ class CurrentVersionMixin(object):
         version ID for the object.
         """
         if self.context['request'].method in permissions.SAFE_METHODS:
-            return reversion.get_for_date(obj, timezone.now()).id
+            try:
+                return reversion.get_for_date(obj, timezone.now()).id
+            except Version.DoesNotExist:
+                return 'Unknown'
         else:
             return 'Unknown'
 
@@ -182,7 +186,6 @@ class VariantSerializer(CurrentVersionMixin,
         """
         Return an ID like "b37-1-883516-G-A".
         """
-        print obj.tags
         return '-'.join([
             'b37',
             obj.tags['chrom_b37'],
