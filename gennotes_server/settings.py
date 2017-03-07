@@ -29,9 +29,18 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = to_bool('DEBUG', 'False')
-USING_SSL = to_bool('USING_SSL', str(not DEBUG))
+if os.getenv('DEBUG', '').lower() == 'false':
+    DEBUG = False
+else:
+    DEBUG = True
+if os.getenv('USING_SSL', '').lower() == 'true':
+    USING_SSL = True
+elif os.getenv('USING_SSL', '').lower() == 'false':
+    USING_SSL = False
+else:
+    USING_SSL = not DEBUG
 
 # Settings per Heroku instructions:
 # https://devcenter.heroku.com/articles/getting-started-with-django
@@ -164,6 +173,11 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', global_settings.EMAIL_HOST_USER)
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD',
                                 global_settings.EMAIL_HOST_PASSWORD)
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', str(global_settings.EMAIL_PORT)))
+DEFAULT_FROM_EMAIL = 'GenNotes <gennotes@gmail.com>'
+
+# For Sendgrid email.
+if EMAIL_BACKEND == 'sgbackend.SendGridBackend':
+    SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
