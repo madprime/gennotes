@@ -12,6 +12,8 @@ from .views import (CurrentUserView,
                     RelationViewSet,
                     VariantViewSet)
 
+from .views_genevieve import genevieve_edit, genevieve_relation_display
+
 router = routers.DefaultRouter()
 
 router.register(r'relation', RelationViewSet)
@@ -43,4 +45,9 @@ urlpatterns = [
 
     # django-allauth URLs
     url(r'^accounts/', include('allauth.urls')),
+
+    # Genevieve notes editing
+    url(r'^genevieve-edit/', genevieve_edit),
+    url(r'^genevieve-effect/(?P<rel_id>[0-9]+)/?', genevieve_relation_display,
+        name='genevieve_relation_display'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

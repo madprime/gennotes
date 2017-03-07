@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<h1>Edit Genevieve Variant Notes</h1>
+
+
+<form action="/genevieve-edit/" method="post"
+  class="form-horizontal">
+  {% csrf_token %}
+  <input type="hidden" name="build" value="b37">
+  {% if relation_id %}
+  <input type="hidden" name="relation_id" value="{{ relation_id }}">
+  {% endif %}
+
+  <input type="hidden" name="chrom" value="{{ var_data.chrom }}">
+  <div class="form-group">
+    <label class="col-sm-2 control-label">Chromosome</label>
+    <div class="col-sm-10">
+      <p class="form-control-static">
+        {{ var_data.chrom_display }}
+      </p>
+    </div>
+  </div>
+
+  <input type="hidden" name="pos" value="{{ var_data.pos }}">
+  <div class="form-group">
+    <label class="col-sm-2 control-label">Position</label>
+    <div class="col-sm-10">
+      <p class="form-control-static">
+        {{ var_data.pos }}
+      </p>
+    </div>
+  </div>
+
+  <input type="hidden" name="ref_allele" value="{{ var_data.ref_allele }}">
+  <div class="form-group">
+    <label class="col-sm-2 control-label">Reference allele</label>
+    <div class="col-sm-10">
+      <p class="form-control-static">
+        {{ var_data.ref_allele }}
+      </p>
+    </div>
+  </div>
+
+  <input type="hidden" name="var_allele" value="{{ var_data.var_allele }}">
+  <div class="form-group">
+    <label class="col-sm-2 control-label">Variant allele</label>
+    <div class="col-sm-10">
+      <p class="form-control-static">
+        {{ var_data.var_allele }}
+      </p>
+    </div>
+  </div>
+
+  {% if var_data.allele_freq %}
+  <div class="form-group">
+    <label class="col-sm-2 control-label"><a href="{{ var_data.exac_url }}">Allele frequency</a></label>
+    <div class="col-sm-10">
+      <p class="form-control-static">
+        {{ var_data.allele_freq }}
+      </p>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="form-group" style="margin-bottom:15px;">
+    This variant is reported to affect a
+      <select class="form-control" name="genevieve_effect_category">
+        <option {% if effect_data.category == 'disease' %}selected {% endif %} value="disease">disease</option>
+        <option  {% if effect_data.category == 'trait' %}selected {% endif %} value="trait">trait</option>
+        <option  {% if effect_data.category == 'other' %}selected {% endif %} value="other">other</option>
+      </select>.
+  </div><br>
+  <div class="form-group" style="margin-bottom:15px;">
+    The variant is reported to
+    <select class="form-control" name="genevieve_effect_significance">
+      <option {% if effect_data.significance == 'causal' %}selected {% endif %} value="causal">cause</option>
+      <option {% if effect_data.significance == 'risk_factor' %}selected {% endif %}value="risk_factor">increase risk for</option>
+      <option {% if effect_data.significance == 'protective' %}selected {% endif %}value="protective">prevent or reduce risk for</option>
+    </select>
+    this disease or trait.
+  </div><br>
+  <div class="form-group" style="margin-bottom:15px;">
+    Disease or trait effect:
+    <input type="text" class="form-control" name="genevieve_effect_name"
+      {% if effect_data.name %}value="{{ effect_data.name }}" {% endif %}
+      placeholder="Name or brief description" style="min-width:50%;">
+    <br>
+    <span class="text-muted">e.g. "Sickle cell disease" or "Breast and ovarian
+      cancer". The ClinVar name is often appropriate, if available.</span>
+  </div><br>
+  <div class="form-group" style="margin-bottom:15px;">
+    Reported inheritance:
+    <select class="form-control" name="genevieve_effect_inheritance">
+      <option {% if effect_data.inheritance == 'dominant' %}selected {% endif %} value="dominant">Dominant</option>
+      <option {% if effect_data.inheritance == 'recessive' %}selected {% endif %} value="recessive">Recessive</option>
+      <option {% if effect_data.inheritance == 'additive' %}selected {% endif %} value="additive">Additive</option>
+      <option {% if effect_data.inheritance == 'other_or_unknown' or not effect_data %}selected {% endif %} value="other_or_unknown">Other or unknown</option>
+    </select>
+  </div><br>
+  <div class="form-group" style="margin-bottom:15px;">
+    This effect should be considered:
+    <select class="form-control" name="genevieve_effect_evidence">
+      <option {% if effect_data.evidence == 'well-established' %}selected {% endif %} value="well-established">well-established</option>
+      <option {% if effect_data.evidence == 'reported' or not effect_data %}selected {% endif %} value="reported">reported</option>
+      <option {% if effect_data.evidence == 'contradicted' %}selected {% endif %} value="contradicted">contradicted</option>
+    </select>
+  </div>
+  <br>
+  {% if mv_data.clinvar.rcv %}
+  <div class="checkbox" style="margin-bottom:15px;">
+    Clinvar records related to this reported effect:<br>
+    {% for rcv in mv_data.clinvar.rcv %}
+      <label style="padding-left:20px;">
+        <input type="checkbox" name="genevieve_effect_clinvar_rcv_records"
+            {% if rcv.accession in effect_data.clinvar_rcv_records %}checked {% endif %}
+            value="{{ rcv.accession }}">
+          <a href="https://www.ncbi.nlm.nih.gov/clinvar/{{ rcv.accession }}">
+            {{ rcv.clinical_significance }}: {{ rcv.conditions.name }}</a>
+      </label><br>
+    {% endfor %}
+  </div><br>
+  {% endif %}
+  <span class="text-muted"><b>Notes about this reported effect</b><br>(Use <a href="https://en.wikipedia.org/wiki/Markdown">Markdown syntax</a> to add links, etc.)</span>
+  <textarea class="form-control" rows="6" name="genevieve_effect_notes"
+    style="min-width:100%;margin-bottom:15px;">{% if effect_data.notes %}{{ effect_data.notes }}{% endif %}</textarea>
+  <p>
+    <b>By submitting edits, you agree to waive copyright and release submitted
+    material as public domain using the <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons CC0 1.0 Public Domain
+    Dedication</a>.</b> Do not submit material if you do not have the rights to make
+    this waiver (e.g. where copyright is held by someone else).
+  </p>
+
+  <div class="form-group" style="margin-bottom:15px;">
+    Commit comment (optional):
+    <input type="text" class="form-control" name="commit_comment"
+      placeholder="Optional comment explaining edits." style="min-width:50%;">
+    <br>
+    <span class="text-muted">e.g. "Updating reported effect to use more standard terminology."</span>
+  </div><br>
+
+  <button type="submit" class="btn btn-primary" style="margin-bottom:15px;">
+    Save variant notes</button>
+  </form>
+
+<p>
+
+{% endblock content %}

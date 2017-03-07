@@ -161,7 +161,7 @@ class RelationViewSet(RevisionUpdateMixin,
     """
     A viewset for Relations.
 
-    Updating ('PUT', 'PATCH', 'POST', and "DELETE") uses django-reversion to record
+    Updating (PUT, PATCH, POST, and DELETE) uses django-reversion to record
     the revision, user, and commit comment. See API Guide for more info.
     """
     permission_classes = (EditAuthorizedOrReadOnly,)

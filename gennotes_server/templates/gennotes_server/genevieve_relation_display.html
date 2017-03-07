@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  {% if version %}
+    <div class="alert alert-info">
+      <p>
+        <b>Historic data:</b> The data displayed below represents historic data
+          for a previous version of these effect notes.
+      </p>
+      <ul>
+        <li><b>User:</b> {{ version.revision.user.username }}</li>
+        <li><b>Date:</b> {{ version.revision.date_created }}</li>
+      </ul>
+    </div>
+  {% endif %}
+  <h1>{{ relation.tags.name }}
+    {% if contradicted %}
+    <span style="color:#b00;">(contradicted)</span>
+    {% elif reported %}
+    <span class="text-muted">(reported)</span>
+    {% endif %}
+  </h1>
+  {% if contradicted %}
+  <div class="alert alert-danger" role="alert">
+    <b>Contradicted effect:</b>
+    The reported effect (described below) has been marked as "contradicted".<br>
+    If this interpretation of evidence seems to be unjustified or erroneous,
+    you can update the effect notes to classify it as "reported" or
+    "well-established".
+  </div>
+  {% elif reported %}
+  <div class="alert alert-warning" role="alert">
+    <p>
+      <b>Reported effect:</b>
+      This effect is merely "reported".
+      It is unclear whether or not this effect actually occurs.
+    </p>
+    <p>
+      If an effect is clearly contradicted by evidence, you can update effect
+      notes to classify this as "contradicted". On the other hand, if there is
+      strong consensus evidence supporting this effect, you can update the
+      effect notes to classify it as "well-established".
+    </p>
+  </div>
+  {% endif %}
+  <h2>Variant data</h2>
+  <p>
+    <b>HGVS:</b> {{ hgvs_format }}<br>
+    {% if allele_freq %}
+    <b><a href="{{ freq_url }}">Allele frequency</a>:</b> {{ allele_freq }}<br>
+    {% else %}
+    <b>Allele frequency:</b> Unknown<br>
+    {% endif %}
+    <b>Chromosome:</b> {{ chrom_display }}<br>
+    <b>Position:</b> {{ relation.variant.tags.pos_b37 }}<br>
+    <b>Reference sequence:</b> {{ relation.variant.tags.ref_allele_b37 }}<br>
+    <b>Variant sequence:</b> {{ relation.variant.tags.var_allele_b37 }}
+  </p>
+  <hr>
+  <p>
+    <b>{% if relation.tags.category == 'disease' %}
+      Disease:
+      {% elif relation.tags.category == 'trait' %}
+      Trait:
+      {% else %}
+      Name
+      {% endif %}</b> {{ relation.tags.name }}<br>
+    <b>Evidence:</b>
+      <span
+      {% if relation.tags.evidence == 'contradicted' %}
+      style="color:#b00;font-weight:bold"
+      {% elif relation.tags.evidence == 'well-established' %}
+      style="color:#000;font-weight:bold;"
+      {% endif %}
+      > {{ relation.tags.evidence|title }}</span><br>
+    <b>Inheritance:</b> {{ relation.tags.inheritance|title }}<br>
+    <b>Significance:</b>
+      {% if relation.tags.significance == 'causal' %}
+      Causal. <span class="text-muted">(Causes {{ relation.tags.name }}.)</span>
+      {% elif relation.tags.significance == 'risk_factor' %}
+      Risk factor. (Increases {% if relation.tags.category == 'disease' %}risk{% else %}probability{% endif %} of {{ relation.tags.name }}.)
+      {% elif relation.tags.significance == 'protective' %}
+      Protective. (Prevents or decreases {% if relation.tags.category == 'disease' %}risk{% else %}probability{% endif %} of {{ relation.tags.name }}.)
+      {% endif %}
+  </p>
+  {% if relation.tags.clinvar_rcv_records %}
+  <p><b>Associated ClinVar records:</b></p>
+    <ul>
+    {% for rcv in relation.tags.clinvar_rcv_records %}
+    <li><a href="https://www.ncbi.nlm.nih.gov/clinvar/{{rcv}}/">{{rcv}}</a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <h3>Notes</h3>
+  {{ relation.tags.notes|markdown }}
+  <hr>
+  {% if version %}
+    <a class="btn btn-default btn-large" href="/genevieve-effect/{{ relation.id }}">Go to current version</a>
+  {% else %}
+    <a class="btn btn-default btn-large" href="/genevieve-edit/?build=b37&amp;chrom={{ relation.variant.tags.chrom_b37 }}&amp;pos={{ relation.variant.tags.pos_b37 }}&amp;ref_allele={{ relation.variant.tags.ref_allele_b37 }}&amp;var_allele={{ relation.variant.tags.var_allele_b37 }}&amp;relation_id={{ relation.id }}">Edit effect notes</a>
+  {% endif %}
+  <hr>
+  <h3>Edit history</h3>
+  <ul>
+  {% for version in edit_history %}
+    <li><a href="/genevieve-effect/{{ relation.id }}?version_id={{ version.id }}">{{ version.revision.date_created }}</a> by {{ version.revision.user.username }}</li>
+  {% endfor %}
+  </ul>
+{% endblock content %}
