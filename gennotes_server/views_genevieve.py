@@ -46,7 +46,7 @@ def get_allele_freq(mv_data, var_allele):
                 exac_data['ref'],
                 var_allele))
         ac = None
-        if exac_data['alleles'] == list:
+        if type(exac_data['alleles']) == list:
             try:
                 idx = exac_data['alleles'].index(var_allele)
                 ac = exac_data['ac']['ac'][idx]
