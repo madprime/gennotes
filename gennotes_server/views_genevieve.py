@@ -146,7 +146,7 @@ def commit_variant_edit(var_data, genevieve_effect_data, relation_id,
 
 def get_mv_data(chrom, pos, ref_allele, var_allele):
     hgvs_format = myvariant.format_hgvs(
-        chrom, pos, ref_allele, var_allele)
+        get_chrom_display(chrom), pos, ref_allele, var_allele)
     mv = myvariant.MyVariantInfo()
     mv_data = mv.getvariant(hgvs_format,
                             fields=['clinvar', 'dbsnp', 'exac'])
