@@ -10,9 +10,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
-    <!-- Override Bootstrap with local styles when we have them, e.g.:
     <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
-    -->
   </head>
 
   <body>
@@ -59,5 +57,20 @@
       {% endblock content %}
     </div>
 
+    <footer class="footer">
+      <div class="container">
+        <hr>
+        <div class="row">
+          <div class="col-sm-8 col-sm-offset-2">
+            <p class="text-muted">
+              GenNotes is <a href="https://github.com/madprime/gennotes">open source</a>,
+              created by <a href="http://www.madeleineball.net/">Madeleine Ball</a>
+              and supported by funding from the <a href="https://shuttleworthfoundation.org/">
+              Shuttleworth Foundation</a>.</p>
+          </div>
+        </div>
+        <img class="center-block" src="{% static 'images/shuttleworth-logo.jpg' %}" style="width:25%;margin-bottom:10px;">
+      </div>
+    </footer>
   </body>
 </html>
