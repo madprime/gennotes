@@ -127,12 +127,13 @@ def commit_variant_edit(var_data, genevieve_effect_data, relation_id,
     if commit_comment:
         reversion.set_comment(comment=commit_comment)
     reversion.set_user(user=user)
-    variant = Variant.objects.get_or_create(
-        tags__chrom_b37=var_data['chrom'],
-        tags__pos_b37=var_data['pos'],
-        tags__ref_allele_b37=var_data['ref_allele'],
-        tags__var_allele_b37=var_data['var_allele'],
-    )
+    tags = {
+        'chrom_b37': var_data['chrom'],
+        'pos_b37': var_data['pos'],
+        'ref_allele_b37': var_data['ref_allele'],
+        'var_allele_b37': var_data['var_allele'],
+    }
+    variant, _ = Variant.objects.get_or_create(tags=tags)
 
     if relation_id:
         relation = Relation.objects.get(id=relation_id)
